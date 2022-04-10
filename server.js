@@ -25,7 +25,7 @@ const log = args.log
 args["help"]
 
 // Documentation
-if (args.help === true) {
+if (args.help == true) {
   console.log('server.js [options]\
   \n--port	Set the port number for the server to listen on. Must be an integer between 1 and 65535.\
   \n--debug	If set to `true`, creates endlpoints /app/log/access/ which returns a JSON access log from the database and /app/error which throws an error with the message "Error test successful." Defaults to `false`.\
@@ -34,7 +34,7 @@ if (args.help === true) {
   process.exit(0)
 }
 
-if (debug === true) {
+if (debug == true) {
   // Access log endpoint
   app.get('/app/logs/access', (req,res) => {
     try {
@@ -53,7 +53,7 @@ if (debug === true) {
 }
 
 // Logging to database
-if (log === true) {
+if (log == true) {
   // Use morgan for logging to files
   // Create a write stream to append (flags: 'a') to a file
   const WRITESTREAM = fs.createWriteStream('access.log', { flags: 'a' })
