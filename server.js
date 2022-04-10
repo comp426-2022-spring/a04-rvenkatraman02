@@ -70,6 +70,19 @@ app.use((req, res, next) => {
   next();
 });
 
+if (debug === true) {
+  // Access log endpoint
+  app.get('/app/log/access', (req,res) => {
+    const stmt = db.prepare('SELECT * FROM accesslog').all()
+    res.status(200).json(stmt)
+  })
+
+  // Error endpoint
+  app.get('/app/error', (req,res) => {
+    throw new Error('Error test successful')
+  })
+}
+
 app.get('/app/', (req,res) => {
   // Respond with status 200
       res.statusCode = 200;
@@ -106,19 +119,6 @@ app.use(function(req,res) {
   res.status(404).end('Endpoint does not exist');
   res.type('text/plain');
 });
-
-if (debug === true) {
-  // Access log endpoint
-  app.get('/app/log/access', (req,res) => {
-    const stmt = db.prepare('SELECT * FROM accesslog').all()
-    res.status(200).json(stmt)
-  })
-
-  // Error endpoint
-  app.get('/app/error', (req,res) => {
-    throw new Error('Error test successful')
-  })
-}
 
 // Default response for any other request
 app.use(function(req,res){
