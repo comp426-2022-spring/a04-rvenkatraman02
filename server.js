@@ -89,13 +89,9 @@ app.get('/app/flip/call/tails', (req,res) => {
 if (debug) {
   // Access log endpoint
   app.get('/app/logs/access', (req,res) => {
-    try {
-      const stmt = db.prepare('SELECT * FROM accesslog').all()
-      res.status(200).json(stmt)
-    }
-    catch {
-      console.error(e)
-    }
+    const stmt = db.prepare('SELECT * FROM accesslog').all()
+      res.statusCode = 200;
+      res.json(stmt);
   })
 
   // Error endpoint
@@ -113,10 +109,10 @@ if (args.help) {
   process.exit(0)
 }
 
-app.use(function(req,res) {
-  res.status(404).end('Endpoint does not exist');
-  res.type('text/plain');
-});
+// app.use(function(req,res) {
+//   res.status(404).end('Endpoint does not exist');
+//   res.type('text/plain');
+// });
 
 // Default response for any other request
 app.use(function(req,res){
