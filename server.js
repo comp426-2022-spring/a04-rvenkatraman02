@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const { argv } = require('process');
 const db = require('./database.js')
-const md5 = requier('md5')
+const md5 = require('md5')
 const morgan = require('morgan')
 const fs = require('fs')
 app.use(express.urlencoded({extended: true}))
