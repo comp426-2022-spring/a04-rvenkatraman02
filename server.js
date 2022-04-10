@@ -37,7 +37,13 @@ if (args.help === true) {
 if (debug === true) {
   // Access log endpoint
   app.get('/app/logs/access', (req,res) => {
-    // return all records in accesslog table
+    try {
+      const stmt = db.prepare('SELECT * FROM accesslog').all()
+      res.status(200).json(stmt)
+    }
+    catch {
+      console.error(e)
+    }
   })
 
   // Error endpoint
@@ -46,6 +52,7 @@ if (debug === true) {
   })
 }
 
+// Logging to database
 if (log === true) {
   // Use morgan for logging to files
   // Create a write stream to append (flags: 'a') to a file
@@ -54,6 +61,7 @@ if (log === true) {
   app.use(morgan('combined', { stream: accesslog }))
 }
 
+// Middleware function
 app.use((req, res, next) => {
   let logdata = {
     remoteaddr: req.ip,
