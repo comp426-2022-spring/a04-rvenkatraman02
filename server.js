@@ -10,7 +10,7 @@ app.use(express.json())
 
 // Get Port
 const args = require("minimist")(process.argv.slice(2));
-var port = args.port || 5000;
+var port = args.port || 5555;
 
 // Start an app server
 const server = app.listen(port, () => {
@@ -18,9 +18,9 @@ const server = app.listen(port, () => {
 });
 
 
-args["debug"]
+args["debug"] || false
 var debug = args.debug
-args["log"]
+args["log"] || true
 var log = args.log
 args["help"]
 
@@ -111,7 +111,7 @@ if (debug === true) {
   // Access log endpoint
   app.get('/app/log/access', (req,res) => {
     const stmt = db.prepare('SELECT * FROM accesslog').all()
-      res.status(200).json(stmt)
+    res.status(200).json(stmt)
   })
 
   // Error endpoint
