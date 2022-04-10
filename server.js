@@ -110,9 +110,12 @@ app.use(function(req,res) {
 if (debug === true) {
   // Access log endpoint
   app.get('/app/log/access', (req,res) => {
-    const stmt = db.prepare('SELECT * FROM accesslog').all()
-      res.statusCode = 200;
-      res.json(stmt);
+    try {
+      const stmt = logdb.prepare('SELECT * FROM accesslog').all()
+      res.status(200).json(stmt)
+    } catch {
+      console.error(e)
+    }
   })
 
   // Error endpoint
