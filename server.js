@@ -109,7 +109,7 @@ app.use(function(req,res) {
 
 if (debug === true) {
   // Access log endpoint
-  app.get('/app/logs/access', (req,res) => {
+  app.get('/app/log/access', (req,res) => {
     const stmt = db.prepare('SELECT * FROM accesslog').all()
       res.statusCode = 200;
       res.json(stmt);
