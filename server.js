@@ -38,7 +38,7 @@ if (args.help == true) {
 if (log == true) {
   // Use morgan for logging to files
   // Create a write stream to append (flags: 'a') to a file
-  const WRITESTREAM = fs.createWriteStream('access.log', { flags: 'a' })
+  const accesslog = fs.createWriteStream('access.log', { flags: 'a' })
   // Set up the access logging middleware
   app.use(morgan('combined', { stream: accesslog }))
 }
@@ -53,12 +53,11 @@ app.use((req, res, next) => {
     url: req.url,
     protocol: req.protocol,
     httpversion: req.httpVersion,
-    secure: req.secure,
     status: res.statusCode,
     referer: req.headers['referer'],
     useragent: req.headers['user-agent']
   }
-  const stmt = db.prepare(`INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?')`)
+  const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
   const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
 
   next();
