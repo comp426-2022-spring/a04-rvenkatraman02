@@ -24,13 +24,30 @@ args["log"]
 var log = args.log
 args["help"]
 
+if (args.help === true) {
+  console.log(`server.js [options]
+  --port	Set the port number for the server to listen on. Must be an integer
+              between 1 and 65535.
+
+  --debug	If set to \`true\`, creates endlpoints /app/log/access/ which returns
+              a JSON access log from the database and /app/error which throws 
+              an error with the message "Error test successful." Defaults to 
+              \`false\`.
+
+  --log		If set to false, no log files are written. Defaults to true.
+              Logs are always written to database.
+
+  --help	Return this message and exit.`)
+  process.exit(0)
+}
+
 // Logging to database
 if (log === true) {
   // Use morgan for logging to files
   // Create a write stream to append (flags: 'a') to a file
   const accesslog = fs.createWriteStream('access.log', { flags: 'a' })
   // Set up the access logging middleware
-  app.use(morgan('combined', { stream: accesslog }))
+  app.use(morgan('accesslog', { stream: accesslog }))
 }
 
 // Middleware function
@@ -47,7 +64,7 @@ app.use((req, res, next) => {
     referer: req.headers['referer'],
     useragent: req.headers['user-agent']
   }
-  const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, datetime, method, url, protocol, httpversion, secure, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+  const stmt = db.prepare('INSERT INTO accesslog (remoteaddr, remoteuser, datetime, method, url, protocol, httpversion, status, referer, useragent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
   const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
 
   next();
@@ -102,15 +119,6 @@ if (debug === true) {
   app.get('/app/error', (req,res) => {
     throw new Error('Error test successful')
   })
-}
-
-if (args.help === true) {
-  console.log('server.js [options]\
-  \n--port	Set the port number for the server to listen on. Must be an integer between 1 and 65535.\
-  \n--debug	If set to `true`, creates endlpoints /app/log/access/ which returns a JSON access log from the database and /app/error which throws an error with the message "Error test successful." Defaults to `false`.\
-  \n--log		If set to false, no log files are written. Defaults to true. Logs are always written to database.\
-  \n--help  Return this message and exit.')
-  process.exit(0)
 }
 
 // Default response for any other request
