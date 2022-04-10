@@ -25,7 +25,7 @@ var log = args.log
 args["help"]
 
 // Logging to database
-if (log) {
+if (log === true) {
   // Use morgan for logging to files
   // Create a write stream to append (flags: 'a') to a file
   const accesslog = fs.createWriteStream('access.log', { flags: 'a' })
@@ -85,7 +85,12 @@ app.get('/app/flip/call/tails', (req,res) => {
   res.status(200).json(flipACoin('tails'));
 });
 
-if (debug) {
+app.use(function(req,res) {
+  res.status(404).end('Endpoint does not exist');
+  res.type('text/plain');
+});
+
+if (debug === true) {
   // Access log endpoint
   app.get('/app/logs/access', (req,res) => {
     const stmt = db.prepare('SELECT * FROM accesslog').all()
@@ -99,7 +104,7 @@ if (debug) {
   })
 }
 
-if (args.help) {
+if (args.help === true) {
   console.log('server.js [options]\
   \n--port	Set the port number for the server to listen on. Must be an integer between 1 and 65535.\
   \n--debug	If set to `true`, creates endlpoints /app/log/access/ which returns a JSON access log from the database and /app/error which throws an error with the message "Error test successful." Defaults to `false`.\
@@ -107,11 +112,6 @@ if (args.help) {
   \n--help  Return this message and exit.')
   process.exit(0)
 }
-
-// app.use(function(req,res) {
-//   res.status(404).end('Endpoint does not exist');
-//   res.type('text/plain');
-// });
 
 // Default response for any other request
 app.use(function(req,res){
