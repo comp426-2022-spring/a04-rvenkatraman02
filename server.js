@@ -1,9 +1,12 @@
 // Require Express.js
 const express = require('express');
 const app = express();
-const { argv } = require('process');
+const db = require('./database.js')
+const md5 = requier('md5')
 const morgan = require('morgan')
 const fs = require('fs')
+app.use(express.urlencoded({extended: true}))
+app.use(express.json())
 
 // Get Port
 const args = require("minimist")(process.argv.slice(2));
@@ -46,10 +49,30 @@ if (debug === true) {
 if (log === true) {
   // Use morgan for logging to files
   // Create a write stream to append (flags: 'a') to a file
-  const WRITESTREAM = fs.createWriteStream('FILE', { flags: 'a' })
+  const WRITESTREAM = fs.createWriteStream('access.log', { flags: 'a' })
   // Set up the access logging middleware
-  app.use(morgan('FORMAT', { stream: WRITESTREAM }))
+  app.use(morgan('combined', { stream: accesslog }))
 }
+
+app.use((req, res, next) => {
+  let logdata = {
+    remoteaddr: req.ip,
+    remoteuser: req.user,
+    time: Date.now(),
+    method: req.method,
+    url: req.url,
+    protocol: req.protocol,
+    httpversion: req.httpVersion,
+    secure: req.secure,
+    status: res.statusCode,
+    referer: req.headers['referer'],
+    useragent: req.headers['user-agent']
+  }
+  const stmt = db.prepare(`INSERT INTO accesslog (remoteaddr, remoteuser, time, method, url, protocol, httpversion, status, referer, useragent) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?')`)
+  const info = stmt.run(logdata.remoteaddr, logdata.remoteuser, logdata.time, logdata.method, logdata.url, logdata.protocol, logdata.httpversion, logdata.status, logdata.referer, logdata.useragent)
+
+  next();
+});
 
 function coinFlip() {
     let flip = Math.floor(Math.random() * 2);
