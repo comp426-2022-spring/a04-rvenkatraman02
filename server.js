@@ -34,24 +34,6 @@ if (args.help == true) {
   process.exit(0)
 }
 
-if (debug == true) {
-  // Access log endpoint
-  app.get('/app/logs/access', (req,res) => {
-    try {
-      const stmt = db.prepare('SELECT * FROM accesslog').all()
-      res.status(200).json(stmt)
-    }
-    catch {
-      console.error(e)
-    }
-  })
-
-  // Error endpoint
-  app.get('/app/error', (req,res) => {
-    throw new Error('Error test successful')
-  })
-}
-
 // Logging to database
 if (log == true) {
   // Use morgan for logging to files
@@ -81,6 +63,24 @@ app.use((req, res, next) => {
 
   next();
 });
+
+if (debug == true) {
+  // Access log endpoint
+  app.get('/app/logs/access', (req,res) => {
+    try {
+      const stmt = db.prepare('SELECT * FROM accesslog').all()
+      res.status(200).json(stmt)
+    }
+    catch {
+      console.error(e)
+    }
+  })
+
+  // Error endpoint
+  app.get('/app/error', (req,res) => {
+    throw new Error('Error test successful')
+  })
+}
 
 function coinFlip() {
     let flip = Math.floor(Math.random() * 2);
